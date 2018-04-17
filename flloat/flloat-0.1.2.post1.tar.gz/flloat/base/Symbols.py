@@ -1,0 +1,41 @@
+from enum import Enum
+
+
+class Symbols(Enum):
+    NOT = "!"
+    AND = "&"
+    OR = "|"
+    # EXISTS = "∃"
+    # FORALL = "Ɐ"
+    EQUAL = "="
+    IMPLIES = "->"
+    EQUIVALENCE = "<->"
+    NEXT = "X"
+    UNTIL = "U"
+    RELEASE = "R"
+    EVENTUALLY = "F"
+    ALWAYS = "G"
+    PATH_UNION = "+"
+    PATH_SEQUENCE = ";"
+    PATH_STAR = "*"
+    PATH_TEST = "?"
+    ROUND_BRACKET_LEFT = "("
+    ROUND_BRACKET_RIGHT = ")"
+    EVENTUALLY_BRACKET_LEFT = "<"
+    EVENTUALLY_BRACKET_RIGHT = ">"
+    ALWAYS_BRACKET_LEFT = "["
+    ALWAYS_BRACKET_RIGHT = "]"
+    # TOP = "⊤"
+    # BOTTOM = "⊥"
+    LAST = "last"
+    END = "end"
+    # LOGICAL_TRUE = "⊤⊤"
+    # LOGICAL_FALSE = "⊥⊥"
+    LOGICAL_TRUE = "tt"
+    LOGICAL_FALSE = "ff"
+    CARET = "^"
+    TRUE="true"
+    FALSE = "false"
+
+
+ALL_SYMBOLS = {v.value for v in Symbols}
