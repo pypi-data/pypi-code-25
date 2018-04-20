@@ -1,0 +1,1 @@
+from es_stats.version import __version__
