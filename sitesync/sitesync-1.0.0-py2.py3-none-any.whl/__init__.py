@@ -1,0 +1,1 @@
+from .sitesync import main
