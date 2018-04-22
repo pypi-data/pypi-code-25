@@ -1,0 +1,10 @@
+__version__ = "0.0.13.post4"
+__git_commiter_name__ = "Arnon Yaari"
+__git_commiter_email__ = "arnony@infinidat.com"
+__git_branch__ = u'develop'
+__git_remote_tracking_branch__ = u'origin/develop'
+__git_remote_url__ = u'git@git.infinidat.com:host-opensource/infi.pysync.git'
+__git_head_hash__ = 'c3ba1f62a2eaa63db27d50cbf42e01ad88fd20de'
+__git_head_subject__ = u'HOSTDEV-2736 change license and add license file'
+__git_head_message__ = u''
+__git_dirty_diff__ = u''
