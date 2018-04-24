@@ -1,0 +1,1 @@
+__author__ = 'H.D. "Chip" McCullough IV'
