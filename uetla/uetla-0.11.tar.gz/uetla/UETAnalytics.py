@@ -1,0 +1,112 @@
+import pandas as pd
+import pickle
+from .UETRegressor import UETRegressor
+from .UETClustering import UETClustering
+from .UETClassification import UETClassification
+from .Database import Database
+import json
+from sklearn import preprocessing
+import os
+
+
+class UETAnalytics:
+
+    def __init__(self, filepath):
+        self.dataset = []
+        self.filepath = filepath
+        # self.scaler = preprocessing.Normalizer()
+
+    # load data from db
+    def loadData(self, nrow=10000):
+        db = Database()
+        self.dataset = db.readDataset()
+        # self.scaler.fit(self.dataset)
+
+    def loadModel(self, modelname, type):
+        db = Database()
+        version = db.checkModelVersion(modelname)
+        filename = self.filepath + '/model/' + modelname + '_' + type + '_' + str(version)
+        return pickle.load(open(filename, 'rb'))
+
+    def createModel(self):
+        self.loadData()
+        columns = ['view', 'post', 'forumview', 'forumpost', 'successsubmission']
+        weeks = ['3', '6', '7', '10', '13', '15']
+        i = 0
+        while i < len(weeks)-1:
+            for column in columns:
+                modelname = weeks[i] + 'w_' + weeks[i + 1] + 'w_' + column
+                self.regression(modelname, 'w' + weeks[i] + '_' + column, 'w' + weeks[i + 1] + '_' + column)
+            i += 1
+
+        week7 = self.clustering('7w',
+                                ['w7_view', 'w7_post', 'w7_forumview', 'w7_forumpost', 'w7_successsubmission',
+                                 'w7_grade'])
+        week15 = self.clustering('15w',
+                                 ['w15_view', 'w15_post', 'w15_forumview', 'w15_forumpost', 'w15_successsubmission',
+                                  'w15_grade'])
+        self.classifcation('15w',
+                           ['view', 'post', 'forumview', 'forumpost', 'successsubmission'], 'group',
+                           week15)
+        self.classifcation('7w',
+                           ['view', 'post', 'forumview', 'forumpost', 'successsubmission'], 'group',
+                           week7)
+
+    def predict(self, week, data):
+        columns = ['view', 'post', 'forumview', 'forumpost', 'successsubmission']
+        predictdata = {}
+        regressiondata = data
+        weeks = [3, 6, 7, 10, 13, 15]
+        i = weeks.index(week)
+        while i < len(weeks):
+            if weeks[i] == 7:
+                model = self.loadModel('7w', 'classification')
+                temp = [[regressiondata['view'], regressiondata['post'], regressiondata['forumview'],
+                         regressiondata['forumpost'], regressiondata['successsubmission']]]
+                predictdata['w7'] = model.predict(temp)[0]
+            if weeks[i] == 15:
+                model = self.loadModel('15w', 'classification')
+                temp = [[data['view'], data['post'], data['forumview'],
+                         data['forumpost'], data['successsubmission']]]
+                predictdata['w15'] = model.predict(temp)[0]
+                break
+            for column in columns:
+                modelname = str(weeks[i]) + 'w_' + str(weeks[i + 1]) + 'w_' + column
+                model = self.loadModel(modelname=modelname, type='regressor')
+                regressiondata[column] = model.predict(regressiondata[column])[0]
+            i += 1
+
+        return json.dumps(predictdata)
+
+    def regression(self, modelname, columnX, columnY):
+        X = self.dataset[columnX]
+        y = self.dataset[columnY]
+        uet = UETRegressor(modelname=modelname, X=X, y=y, filepath=self.filepath)
+        uet.fit()
+        uet.saveModel()
+
+    def classifcation(self, modelname, columnX, columnY, traindata=[]):
+        X = traindata[columnX]
+        y = traindata[columnY]
+        uet = UETClassification(modelname=modelname, X=X, y=y, filepath=self.filepath)
+        uet.fit()
+        uet.saveModel()
+
+    def clustering(self, modelname, columnXs):
+        X = self.dataset[columnXs]
+        uet = UETClustering(n_cluster=3, X=X, modelname=modelname, filepath=self.filepath)
+        uet.saveModel()
+        best = uet.labelGrade(["F", "B", "A"])
+        clusterF = best[best.group == "F"]
+        clusterB = best[best.group == "B"]
+        clusterA = best[best.group == "A"]
+        cluster = UETClustering(n_cluster=2, X=clusterB)
+        cluster.X = clusterB[clusterB.columns[0:6]]
+        cluster.fit()
+        clusterB = cluster.labelGrade(["D", "C"])
+        clusters = UETClustering(n_cluster=2, X=clusterA)
+        clusters.X = clusterA[clusterA.columns[0:6]]
+        clusters.fit()
+        clusterA = clusters.labelGrade(["B", "A"])
+        best = clusterF.append(clusterA).append(clusterB)
+        return best
