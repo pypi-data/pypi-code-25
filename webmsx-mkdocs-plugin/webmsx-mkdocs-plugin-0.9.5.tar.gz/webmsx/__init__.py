@@ -1,0 +1,1 @@
+from .webmsx import WebMSXPlugin
