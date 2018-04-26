@@ -1,0 +1,2 @@
+from point_spectra_gui.core.outlierRemovalMethods import outliers_IsolationForest
+from point_spectra_gui.core.outlierRemovalMethods import outliers_LOF
