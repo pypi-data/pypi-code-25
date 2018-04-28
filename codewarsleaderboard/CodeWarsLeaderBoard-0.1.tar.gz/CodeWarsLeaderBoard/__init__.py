@@ -1,0 +1,1 @@
+from CodeWarsLeaderBoard import codewars_leaderboard
