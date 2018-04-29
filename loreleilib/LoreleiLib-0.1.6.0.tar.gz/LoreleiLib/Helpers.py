@@ -1,0 +1,1 @@
+firstLetterLowercase = lambda s: s[:1].lower() + s[1:] if s else ''
