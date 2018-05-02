@@ -1,0 +1,1 @@
+from .prs_generator import BasePRsGenerator
