@@ -1,0 +1,110 @@
+from setuptools import setup
+from setuptools import find_packages
+
+version = '2.0.1'
+
+classifiers = """
+Development Status :: 5 - Production/Stable
+Environment :: Console
+Environment :: Plugins
+Framework :: Setuptools Plugin
+Intended Audience :: Developers
+License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)
+Operating System :: MacOS :: MacOS X
+Operating System :: Microsoft :: Windows
+Operating System :: POSIX
+Operating System :: POSIX :: BSD
+Operating System :: POSIX :: Linux
+Operating System :: OS Independent
+Programming Language :: JavaScript
+Programming Language :: Python
+Programming Language :: Python :: 2
+Programming Language :: Python :: 2.7
+Programming Language :: Python :: 3
+Programming Language :: Python :: 3.3
+Programming Language :: Python :: 3.4
+Programming Language :: Python :: 3.5
+Programming Language :: Python :: 3.6
+Programming Language :: Python :: Implementation :: CPython
+Programming Language :: Python :: Implementation :: PyPy
+Topic :: Software Development :: Build Tools
+Topic :: System :: Software Distribution
+Topic :: Utilities
+""".strip().splitlines()
+
+package_json = {
+    "dependencies": {
+        "requirejs": "~2.1.17",
+        # This should be provided by some templating library that
+        # require text templates through the same import mechanism.
+        # "requirejs-text": "~2.0.12",
+    },
+    "devDependencies": {
+        "karma-requirejs": "~0.2.2",
+    },
+}
+
+
+long_description = (
+    open('README.rst').read()
+    + '\n' +
+    open('CHANGES.rst').read()
+    + '\n')
+
+setup(
+    name='calmjs.rjs',
+    version=version,
+    description=(
+        "Package for the integration of RequireJS into a Python "
+        "environment via the Calmjs framework, to provide a reproducible "
+        "workflow for the generation of deployable artifacts from "
+        "JavaScript source code provided by Python packages in "
+        "conjunction with standard JavaScript or Node.js packages sourced "
+        "from npm or other similar package repositories."
+    ),
+    long_description=long_description,
+    # Get more strings from
+    # http://pypi.python.org/pypi?%3Aaction=list_classifiers
+    classifiers=classifiers,
+    keywords='',
+    author='Tommy Yu',
+    author_email='tommy.yu@auckland.ac.nz',
+    url='https://github.com/calmjs/calmjs.rjs',
+    license='gpl',
+    packages=find_packages('src'),
+    package_dir={'': 'src'},
+    namespace_packages=['calmjs'],
+    include_package_data=True,
+    zip_safe=False,
+    install_requires=[
+        'calmjs>=2.0.0,<4',
+        'calmjs.parse>=1.0.0,<2',
+    ],
+    extras_require={
+        'dev': [
+            'calmjs.dev>=1.0.2,<2',
+        ],
+    },
+    entry_points={
+        # If to be unleashed as a standalone tool.
+        # 'console_scripts': [
+        #     'rjs = calmjs.rjs.runtime:default',
+        # ],
+        'calmjs.registry': [
+            'calmjs.rjs.loader_plugin'
+            ' = calmjs.rjs.registry:LoaderPluginRegistry',
+        ],
+        'calmjs.rjs.loader_plugin': [
+            'text = calmjs.rjs.loaderplugin:TextPlugin',
+        ],
+        'calmjs.runtime': [
+            'rjs = calmjs.rjs.runtime:default',
+        ],
+        'calmjs.toolchain.advice': [
+            'calmjs.dev.toolchain:KarmaToolchain = calmjs.rjs.dev:rjs_advice',
+        ],
+    },
+    package_json=package_json,
+    calmjs_module_registry=['calmjs.module'],
+    test_suite="calmjs.rjs.tests.make_suite",
+)
