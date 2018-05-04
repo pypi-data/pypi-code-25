@@ -1,0 +1,202 @@
+# -*- coding: utf-8 -*-
+
+"""Command-Line Interface for collatelogs"""
+
+from __future__ import absolute_import, print_function, unicode_literals
+
+import argparse
+from glob import glob
+import logging
+import os
+
+from .collatelogs import format_simple, format_advanced
+from .util import read_config
+
+logger = logging.getLogger(__name__)
+
+CONFIG_SEARCH_PATHS = [
+    '~/.cl_config.yaml',
+    './config.yaml',
+    os.path.realpath(os.path.join(os.path.dirname(__file__), 'example_config.yaml'))
+]
+
+def find_config_file():
+    """Search CONFIG_SEARCH_PATHS until config file is found; open and return it"""
+    for config_path in CONFIG_SEARCH_PATHS:
+        logger.debug("Searching for config file at: %s", config_path)
+        try:
+            config = read_config(config_path)
+            logger.debug("Found config file at: %s", config_path)
+            return config
+        except IOError:
+            pass
+
+    raise ValueError("Could not find any config file!")
+
+
+def get_value_from_arg_or_config(key, args, config):
+    """Return args[key] or config[key] or raise error"""
+
+    if key in args.__dict__ and args.__dict__[key]:
+        value = args.__dict__[key]
+        logger.debug("Found key %s in args", key)
+    else:
+        try:
+            value = config[key]
+        except KeyError:
+            raise ValueError('{} must be specified either as an argument or '
+                             'in the config file!'.format(key))
+        logger.debug("Found key %s in config file", key)
+
+    return value
+
+
+def parse_args():
+    """Perform argument parsing"""
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        'logs',
+        nargs='+',
+        help="Sparrow log file paths"
+    )
+    parser.add_argument(
+        '-d', '--parse-timestamps',
+        action='store_true',
+        help="Enable reformatting of datetime prefixes. This will be MUCH "
+             "slower! Uses the format indicated by --date-format"
+    )
+    parser.add_argument(
+        '-l', '--timestamp-length',
+        type=int,
+        help='The length of the timestamp at the beginning of each log line. '
+             'If given, only basic formatting will be available. Fast!'
+    )
+    parser.add_argument(
+        '-b', '--bad-line-behavior',
+        choices=('keep', 'discard', 'error'),
+        help="TODO"
+    )
+    parser.add_argument(
+        '--allow-duplicates',
+        action='store_true',
+        help="If given, don't remove duplicate log lines from the output. "
+             "NOTE: Lines are considered duplicate only if they are EXACTLY "
+             "the same, including timestamp"
+    )
+    parser.add_argument(
+        '--no-strip',
+        action='store_true',
+        help='Indicates that lines should not be stripped. NOTE: This only '
+             'has an effect if in "simple" mode'
+    )
+    parser.add_argument(
+        '-p', '--precision',
+        type=int,
+        default=3,
+        choices=range(1, 7),
+        help="The precision of the microsecond string format (if given), as a "
+             "number of digits (defaults to milliseconds)"
+    )
+    parser.add_argument(
+        '-P', '--pad-milli',
+        action='store_true',
+        help="Use this option if you have timestamps with formats that differ only "
+             "in their inclusion of milliseconds. That is, if one timestamp format "
+             "includes millisconds, but others don't, then you can give this argument "
+             "to pad those that don't. This will allow them to sort properly. NOTE: "
+             "This accomplishes the same thing as --date-format, but is MUCH faster "
+             "(if this is the only difference in date formats)"
+    )
+    parser.add_argument(
+        '-c', '--config',
+        help="The path to the config file. If this is not given, the "
+             "following paths will be searched: {}".format(CONFIG_SEARCH_PATHS),
+    )
+    parser.add_argument(
+        '-v', '--verbose',
+        action='store_true',
+        # choices=('debug', 'info', 'warning', 'error',
+        #          'DEBUG', 'INFO', 'WARNING', 'ERROR'),
+        help="Increase logging verbosity"
+    )
+
+    config_group = parser.add_argument_group(
+        'config',
+        'These arguments will override config file values'
+    )
+    config_group.add_argument(
+        '-D', '--date-format',
+        help="NOTE: If given, this will enable reformatting of datetime "
+             "prefixes. This will be much slower!"
+    )
+    config_group.add_argument(
+        '-f', '--prefix-output-format',
+        help='The output format of the log line prefix. This is a "new style"'
+             'format'
+    )
+    config_group.add_argument(
+        '-r', '--prefix-regexes',
+        metavar="PREFIX_REGEX",
+        nargs='+',
+        help='A regular expression indicating the expected format(s) of '
+             'the given logs. These will be tried in the given order, and the '
+             'first match will be used. If no match is found, an error will be '
+             'raised'
+    )
+    parsed_args = parser.parse_args()
+    logs = []
+    for log in parsed_args.logs:
+        logs.extend(glob(log))
+
+    if not logs:
+        parser.error('Either none of the given paths {} exist, or none of them '
+                     'contain files!'.format(parsed_args.logs))
+
+    parsed_args.logs = logs
+    return parsed_args
+
+
+def main():
+    """Entry point"""
+
+    args = parse_args()
+
+    if args.verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
+        logger.debug("Set logging level to DEBUG")
+
+    if args.timestamp_length:
+        lines = format_simple(
+            log_paths=args.logs,
+            timestamp_length=args.timestamp_length,
+            allow_duplicates=args.allow_duplicates,
+            bad_line_behavior=args.bad_line_behavior,
+            no_strip=args.no_strip
+        )
+    else:
+        if args.config:
+            config = read_config(args.config)
+        else:
+            config = find_config_file()
+        prefix_regexes = get_value_from_arg_or_config('prefix_regexes', args, config)
+        date_format = get_value_from_arg_or_config('date_format', args, config)
+        prefix_output_format = get_value_from_arg_or_config('prefix_output_format', args, config)
+
+        # If user has not requested timestamp parsing, set date_format to None
+        # to indicate that it is not needed
+        if not args.parse_timestamps:
+            date_format = None
+        lines = format_advanced(
+            log_paths=args.logs,
+            prefix_output_format=prefix_output_format,
+            date_format=date_format,
+            prefix_regexes=prefix_regexes,
+            bad_line_behavior=args.bad_line_behavior,
+            allow_duplicates=args.allow_duplicates,
+            pad_milliseconds=args.pad_milli,
+            subsecond_digits=args.precision
+        )
+
+    print("\n".join(lines))
