@@ -1,0 +1,7 @@
+version = '0.3.1'
+name = 'eazytv'
+description = 'Command Line Utility for search and download shows from EZTV'
+url = 'https://github.com/Germione/easytv'
+author = 'Jerome Pradier'
+author_email = 'jerome.pradier@gmail.com'
+license = 'MIT'
