@@ -1,0 +1,23 @@
+# BUS
+BUS_GETROUTELINES = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/bus/GetRouteLines.php'
+BUS_GETROUTELINESROUTE = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/bus/GetRouteLinesRoute.php'
+BUS_GETCALENDAR = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/bus/GetCalendar.php'
+BUS_GETLISTLINES = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/bus/GetListLines.php'
+BUS_GETLISTLINESEXTEND = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/bus/GetListLinesExtend.php'
+BUS_GETGROUPS = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/bus/GetGroups.php'
+BUS_GETTIMESLINES = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/bus/GetTimesLines.php'
+BUS_GETTIMETABLELINES = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/bus/GetTimeTableLines.php'
+BUS_GETNODESLINES = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/bus/GetNodesLines.php'
+
+# GEO
+GEO_GETSTREET = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/geo/GetStreet.php'
+GEO_GETSTOPFROMSTOP = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/geo/GetStopsFromStop.php'
+GEO_GETSTOPSFROMXY = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/geo/GetStopsFromXY.php'
+GEO_GETARRIVESTOP = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/geo/GetArriveStop.php'
+GEO_GETPOINTSOFINTERESTTYPE = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/geo/GetPointsOfInterestTypes.php'
+GEO_GETPOINTSOFINTEREST = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/geo/GetPointsOfInterest.php'
+GEO_GETSTREETFROMXY = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/geo/getStreetFromXY.php'
+GEO_GETINFOLINE = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/geo/GetInfoLine.php'
+GEO_GETINFOLINEEXTEND = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/geo/GetInfoLineExtend.php'
+GEO_GETSTOPSLINE = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/geo/GetStopsLine.php'
+GEO_GETGROUPS = 'https://openbus.emtmadrid.es:9443/emt-proxy-server/last/geo/GetGroups.php'
