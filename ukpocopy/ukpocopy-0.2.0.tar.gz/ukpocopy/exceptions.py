@@ -1,0 +1,2 @@
+class InvalidPostcodeException(Exception):
+    pass
