@@ -1,0 +1,71 @@
+import ssl
+try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    # Legacy Python that doesn't verify HTTPS certificates by default
+    pass
+else:
+    # Handle target environment that doesn't support HTTPS verification
+    ssl._create_default_https_context = _create_unverified_https_context
+import requests
+try:
+    requests.packages.urllib3.disable_warnings()
+except AttributeError:
+    pass
+else:
+    requests.packages.urllib3.disable_warnings()
+try:
+    from .packages.urllib3.exceptions import ResponseError
+except:
+    pass
+
+import json
+
+class Assets(object):
+    def __init__(self, server, token):
+        self.server = server
+        self.token = token
+
+    def get(self, limit=None):
+        if limit is not None:
+            self.uri = '/api/v1/hardware?limit=' + str(limit)
+        else:
+            self.uri = '/api/v1/hardware'
+        self.server = self.server + self.uri
+        headers = {'Authorization': 'Bearer ' + self.token}
+        results = requests.get(self.server, headers=headers)
+        return results.content
+        #return json.dumps(results.json(),indent=4, separators=(',', ':'))
+
+    def create(self, payload):
+        self.uri = '/api/v1/hardware'
+        self.server = self.server + self.uri
+        headers = {'Content-Type': 'application/json','Authorization': 'Bearer ' + self.token}
+        results = requests.post(self.server, headers=headers, data=payload)
+        return json.dumps(results.json(),indent=4, separators=(',', ':'))
+
+    def getID(self, asset_name):
+        self.uri = '/api/v1/hardware?search='
+        self.server = self.server + self.uri + asset_name
+        headers = {'Content-Type': 'application/json','Authorization': 'Bearer ' + self.token}
+        results = requests.get(self.server, headers=headers)
+        jsonData = json.loads(results.content)
+        if len(jsonData['rows']) < 2 and jsonData['rows'][0]['id'] is not None:
+            AssetID = jsonData['rows'][0]['id']
+        return AssetID
+
+    def delete(self, DeviceID):
+        self.uri = '/api/v1/hardware/'
+        self.server = self.server + self.uri + DeviceID
+        headers = {'Content-Type': 'application/json','Authorization': 'Bearer ' + self.token}
+        results = requests.delete(self.server, headers=headers)
+        jsonData = json.loads(results.content)
+        return jsonData['status']
+
+    def updateDevice(self, DeviceID, payload):
+        self.uri = '/api/v1/hardware/'
+        self.server = self.server + self.uri + DeviceID
+        headers = {'Content-Type': 'application/json','Authorization': 'Bearer ' + self.token}
+        results = requests.patch(self.server, headers=headers, data=payload)
+        jsonData = json.loads(results.content)
+        return jsonData['status']
