@@ -1,0 +1,194 @@
+# Copyright (c) 2016 VMware, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+from oslo_utils import uuidutils
+
+FAKE_NAME = "fake_name"
+FAKE_SWITCH_UUID = uuidutils.generate_uuid()
+FAKE_IP_SET_UUID = uuidutils.generate_uuid()
+
+FAKE_PORT_UUID = uuidutils.generate_uuid()
+FAKE_PORT = {
+    "id": FAKE_PORT_UUID,
+    "display_name": FAKE_NAME,
+    "resource_type": "LogicalPort",
+    "address_bindings": [],
+    "logical_switch_id": FAKE_SWITCH_UUID,
+    "admin_state": "UP",
+    "attachment": {
+        "id": "9ca8d413-f7bf-4276-b4c9-62f42516bdb2",
+        "attachment_type": "VIF"
+    },
+    "switching_profile_ids": [
+        {
+            "value": "64814784-7896-3901-9741-badeff705639",
+            "key": "IpDiscoverySwitchingProfile"
+        },
+        {
+            "value": "fad98876-d7ff-11e4-b9d6-1681e6b88ec1",
+            "key": "SpoofGuardSwitchingProfile"
+        },
+        {
+            "value": "93b4b7e8-f116-415d-a50c-3364611b5d09",
+            "key": "PortMirroringSwitchingProfile"
+        },
+        {
+            "value": "fbc4fb17-83d9-4b53-a286-ccdf04301888",
+            "key": "SwitchSecuritySwitchingProfile"
+        },
+        {
+            "value": "f313290b-eba8-4262-bd93-fab5026e9495",
+            "key": "QosSwitchingProfile"
+        }
+    ]
+}
+
+FAKE_CONTAINER_PORT = {
+    "id": FAKE_PORT_UUID,
+    "display_name": FAKE_NAME,
+    "resource_type": "LogicalPort",
+    "address_bindings": [
+        {
+            "ip_address": "192.168.1.110",
+            "mac_address": "aa:bb:cc:dd:ee:ff"
+        }
+    ],
+    "logical_switch_id": FAKE_SWITCH_UUID,
+    "admin_state": "UP",
+    "attachment": {
+        "id": "9ca8d413-f7bf-4276-b4c9-62f42516bdb2",
+        "attachment_type": "VIF",
+        "context": {
+            "vlan_tag": 122,
+            "container_host_vif_id": "c6f817a0-4e36-421e-98a6-8a2faed880bc",
+            "resource_type": "VifAttachmentContext",
+            "app_id": "container-1",
+            "vif_type": "CHILD",
+            "allocate_addresses": "Both",
+        }
+    },
+    "switching_profile_ids": [
+        {
+            "value": "64814784-7896-3901-9741-badeff705639",
+            "key": "IpDiscoverySwitchingProfile"
+        },
+        {
+            "value": "fad98876-d7ff-11e4-b9d6-1681e6b88ec1",
+            "key": "SpoofGuardSwitchingProfile"
+        },
+        {
+            "value": "93b4b7e8-f116-415d-a50c-3364611b5d09",
+            "key": "PortMirroringSwitchingProfile"
+        },
+        {
+            "value": "fbc4fb17-83d9-4b53-a286-ccdf04301888",
+            "key": "SwitchSecuritySwitchingProfile"
+        },
+        {
+            "value": "f313290b-eba8-4262-bd93-fab5026e9495",
+            "key": "QosSwitchingProfile"
+        }
+    ]
+}
+
+
+FAKE_ROUTER_UUID = uuidutils.generate_uuid()
+FAKE_ROUTER = {
+    "resource_type": "LogicalRouter",
+    "revision": 0,
+    "id": FAKE_ROUTER_UUID,
+    "display_name": FAKE_NAME
+}
+
+FAKE_ROUTER_PORT_UUID = uuidutils.generate_uuid()
+FAKE_ROUTER_PORT = {
+    "resource_type": "LogicalRouterLinkPort",
+    "revision": 0,
+    "id": FAKE_ROUTER_PORT_UUID,
+    "display_name": FAKE_NAME,
+    "logical_router_id": FAKE_ROUTER_UUID
+}
+
+FAKE_QOS_PROFILE = {
+    "resource_type": "QosSwitchingProfile",
+    "id": uuidutils.generate_uuid(),
+    "display_name": FAKE_NAME,
+    "system_defined": False,
+    "dscp": {
+        "priority": 25,
+        "mode": "UNTRUSTED"
+    },
+    "tags": [],
+    "description": FAKE_NAME,
+    "class_of_service": 0,
+    "shaper_configuration": [
+        {
+            "resource_type": "IngressRateShaper",
+            "enabled": False,
+            "peak_bandwidth_mbps": 0,
+            "burst_size_bytes": 0,
+            "average_bandwidth_mbps": 0
+        },
+        {
+            "resource_type": "IngressBroadcastRateShaper",
+            "enabled": False,
+            "peak_bandwidth_kbps": 0,
+            "average_bandwidth_kbps": 0,
+            "burst_size_bytes": 0
+        },
+        {
+            "resource_type": "EgressRateShaper",
+            "enabled": False,
+            "peak_bandwidth_mbps": 0,
+            "burst_size_bytes": 0,
+            "average_bandwidth_mbps": 0
+        }
+    ],
+    "_last_modified_user": "admin",
+    "_last_modified_time": 1438383180608,
+    "_create_time": 1438383180608,
+    "_create_user": "admin",
+    "_revision": 0
+}
+
+FAKE_IP_POOL_UUID = uuidutils.generate_uuid()
+FAKE_IP_POOL = {
+    "_revision": 0,
+    "id": FAKE_IP_POOL_UUID,
+    "display_name": "IPPool-IPV6-1",
+    "description": "IPPool-IPV6-1 Description",
+    "subnets": [{
+        "dns_nameservers": [
+            "2002:a70:cbfa:1:1:1:1:1"
+        ],
+        "allocation_ranges": [{
+            "start": "2002:a70:cbfa:0:0:0:0:1",
+            "end": "2002:a70:cbfa:0:0:0:0:5"
+        }],
+        "gateway_ip": "2002:a80:cbfa:0:0:0:0:255",
+        "cidr": "2002:a70:cbfa:0:0:0:0:0/24"
+    }],
+}
+
+FAKE_IP_SET = {
+    "id": FAKE_IP_SET_UUID,
+    "display_name": FAKE_NAME,
+    "resource_type": "IPSet",
+    "ip_addresses": [
+        "192.168.1.1-192.168.1.6",
+        "192.168.1.8",
+        "192.168.4.8/24"]
+}
