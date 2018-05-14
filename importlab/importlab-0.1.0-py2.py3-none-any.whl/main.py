@@ -1,0 +1,74 @@
+#!/usr/bin/env python3.6
+
+# Copyright 2017 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""main entry point."""
+
+from __future__ import print_function
+
+import argparse
+import os
+import sys
+
+from importlab import environment
+from importlab import fs
+from importlab import graph
+from importlab import output
+from importlab import utils
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('filenames', metavar='filename', type=str, nargs='*',
+                        help='input file(s)')
+    parser.add_argument('--tree', dest='tree', action='store_true',
+                        default=False,
+                        help='Display import tree.')
+    parser.add_argument('--unresolved', dest='unresolved', action='store_true',
+                        default=False,
+                        help='Display unresolved dependencies.')
+    parser.add_argument('--quiet', dest='quiet', action='store_true',
+                        default=False,
+                        help="Don't print errors to stdout.")
+    parser.add_argument('-V', '--python_version', type=str, action='store',
+        dest='python_version', default='3.6',
+                        help='Python version of target code, e.g. "2.7"')
+    parser.add_argument('-P', '--pythonpath', type=str, action='store',
+                        dest='pythonpath', default='',
+                        help=('Directories for reading dependencies - a list of paths '
+                              'separated by "%s".') % os.pathsep)
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+    env = environment.create_from_args(args)
+    import_graph = graph.ImportGraph.create(env, args.filenames)
+
+    if args.tree:
+        print('Source tree:')
+        output.print_tree(import_graph)
+        sys.exit(0)
+
+    if args.unresolved:
+        print('Unresolved dependencies:')
+        output.print_unresolved_dependencies(import_graph)
+        sys.exit(0)
+
+    print('Nothing to do!')
+
+
+if __name__ == "__main__":
+    sys.exit(main())
