@@ -1,0 +1,65 @@
+PP_DEFAULT = '_default_'  # use default prettyprint configs
+
+LOG_ALL = 0
+TRACE = 5
+DEBUG = 10
+DEBUG1 = 11
+DEBUG2 = 12
+DEBUG3 = 13
+DEBUG4 = 14
+DEBUG5 = 15
+DEBUG6 = 16
+DEBUG7 = 17
+DEBUG8 = 18
+DEBUG9 = 19
+INFO = 20
+INFO1 = 21
+INFO2 = 22
+INFO3 = 23
+INFO4 = 24
+NOTICE = 25
+INFO5 = 25
+INFO6 = 26
+INFO7 = 27
+INFO8 = 28
+INFO9 = 29
+WARNING = 30
+WARN = 30
+WARN1 = 31
+WARN2 = 32
+WARN3 = 33
+WARN4 = 34
+WARN5 = 35
+WARN6 = 36
+WARN7 = 37
+WARN8 = 38
+WARN9 = 39
+ERROR = 40
+ERROR1 = 41
+ERROR2 = 42
+ERROR3 = 43
+ERROR4 = 44
+ERROR5 = 45
+ERROR6 = 46
+ERROR7 = 47
+ERROR8 = 48
+ERROR9 = 49
+CRITICAL = 50
+CRITICAL1 = 51
+CRITICAL2 = 52
+CRITICAL3 = 53
+CRITICAL4 = 54
+CRITICAL5 = 55
+CRITICAL6 = 56
+CRITICAL7 = 57
+CRITICAL8 = 58
+CRITICAL9 = 59
+LOG_OFF = 100
+
+
+if __name__ == '__main__':
+    from nanolog.logger import _NAME2LEVEL
+    # generate this file
+    for name, value in sorted(_NAME2LEVEL.items(), key=lambda x: x[1]):
+        print('{} = {}'.format(name, value))
+
