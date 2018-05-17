@@ -1,0 +1,6 @@
+version = '1.0.1'
+author = 'Minghao Ni'
+email = 'niminghao804@gmail.com'
+description = 'Generate and build a static website'
+url = 'https://github.com/nmhnmh/sitekicker'
+license = 'MIT'
