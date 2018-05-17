@@ -1,0 +1,2 @@
+class BlihException(Exception):
+    pass
