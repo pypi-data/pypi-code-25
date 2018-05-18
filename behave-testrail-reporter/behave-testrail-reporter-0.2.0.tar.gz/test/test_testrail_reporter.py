@@ -1,0 +1,155 @@
+# -*- coding: utf-8 -*-
+
+import unittest
+import sys
+import yaml
+import os
+from functools import partial
+
+from mock import Mock
+from behave.model import Scenario
+
+from behave_testrail_reporter.api import APIClient
+from behave_testrail_reporter import TestrailReporter
+
+
+class TestrailReporterTestCase(unittest.TestCase):
+    def setUp(self):
+        data = {
+            'base_url': 'https://test.testrail.net',
+            'projects': [
+                {
+                    'name': 'Testrail project name',
+                    'id': 1,
+                    'suite_id': 11,
+                    'allowed_branch_pattern': '*',
+                },
+                {
+                    'name': 'Testrail project name',
+                    'id': 2,
+                    'suite_id': 22,
+                    'allowed_branch_pattern': '*',
+                }
+            ]
+        }
+
+        with open(u'testrail.yml', u'w') as outfile:
+            yaml.dump(data, outfile, default_flow_style=False)
+
+    def tearDown(self):
+        os.remove(u'testrail.yml')
+
+    def test_load_config(self):
+        testrail_reporter = TestrailReporter(u'master')
+        empty_config = {}
+
+        self.assertNotEqual(empty_config, testrail_reporter.config)
+
+    def test_build_comment_for_scenario(self):
+        testrail_reporter = TestrailReporter(u'master')
+
+        step_01 = Mock(status=u'passed', keyword=u'given')
+        step_01.name = u'step_01'
+        step_02 = Mock(status=u'passed', keyword=u'given')
+        step_02.name = u'step_02'
+
+        steps = [step_01, step_02, ]
+
+        mock_scenario = Mock(Scenario)
+        mock_scenario.name = u'Dummy scenario'
+        mock_scenario.steps = steps
+        comment = testrail_reporter._buid_comment_for_scenario(mock_scenario)
+        expected_comment = (
+            u'Dummy scenario\n'
+            u'->  given step_01 [passed]\n'
+            u'->  given step_02 [passed]')
+        self.assertEqual(expected_comment, comment)
+
+    def test_build_comment_for_scenario_with_utf8_string(self):
+        testrail_reporter = TestrailReporter(u'master')
+
+        step_01 = Mock(status=u'passed', keyword=u'given')
+        step_01.name = u'step_01 £'
+
+        steps = [step_01]
+
+        mock_scenario = Mock(Scenario)
+        mock_scenario.name = u'Dummy scenario'
+        mock_scenario.steps = steps
+        comment = testrail_reporter._buid_comment_for_scenario(mock_scenario)
+        expected_comment = (
+            u'Dummy scenario\n'
+            u'->  given step_01 £ [passed]')
+        self.assertEqual(expected_comment, comment)
+
+    def test_format_duration(self):
+        testrail_reporter = TestrailReporter(u'master')
+        duration = 69
+        formatted_duration = testrail_reporter._format_duration(duration)
+
+        self.assertEquals(u'69s', formatted_duration)
+
+    def test_format_duration_return_one_for_zero_durations(self):
+        testrail_reporter = TestrailReporter(u'master')
+        duration = 0
+        formatted_duration = testrail_reporter._format_duration(duration)
+
+        self.assertEquals(u'1s', formatted_duration)
+
+
+class TestrailReporterTestLoadConfig(unittest.TestCase):
+    def test_config_file_is_not_present(self):
+        with self.assertRaises(Exception) as context:
+            TestrailReporter(u'master')
+
+        exception_message = u'Could not read `testrail.yml` file, check the file exists in root of your project.'
+        self.assertTrue(exception_message in context.exception.args[0])
+
+    def test_config_file_is_not_valid_yaml_file(self):
+        self.addCleanup(partial(os.remove, u'testrail.yml'))
+        with open(u'testrail.yml', 'w') as outfile:
+            outfile.write(u'-\n--\n---')
+
+        with self.assertRaises(Exception) as context:
+            TestrailReporter(u'master')
+
+        exception_message = u'Error loading testrail.yml file:'
+        self.assertTrue(exception_message in context.exception.args[0])
+
+    def test_config_file_is_missing_base_url(self):
+        self.addCleanup(partial(os.remove, u'testrail.yml'))
+        data = {
+            'projects': [
+                {
+                    'name': 'Testrail project name',
+                    'id': 1,
+                    'suite_id': 11,
+                    'allowed_branch_pattern': '*',
+                },
+            ]
+        }
+
+        with open(u'testrail.yml', u'w') as outfile:
+            yaml.dump(data, outfile, default_flow_style=False)
+
+        with self.assertRaises(Exception) as context:
+            TestrailReporter(u'master')
+
+        exception_message = u'Invalid testrail.yml file! error: \'base_url\' is a required property'
+        self.assertEquals(exception_message, context.exception.args[0])
+
+    def test_config_file_without_projects(self):
+        self.addCleanup(partial(os.remove, u'testrail.yml'))
+        data = {
+            'base_url': 'https://test.testrail.net',
+            'projects': []
+        }
+
+        with open(u'testrail.yml', u'w') as outfile:
+            yaml.dump(data, outfile, default_flow_style=False)
+
+        with self.assertRaises(Exception) as context:
+            TestrailReporter(u'master')
+
+        exception_message = u'Your testrail.yml config file does not have any project configured!'
+        self.assertEquals(exception_message, context.exception.args[0])
