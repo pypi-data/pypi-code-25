@@ -1,0 +1,68 @@
+DEFAULT_CONFIG = r"""
+token: "xxxxxxxxxxxxxxxx"    # lichess OAuth2 Token
+url: "https://lichess.org/"  # lichess base URL
+
+engine:                      # engine settings
+  dir: "./engines/"          # dir containing engines, relative to this project
+  name: "engine_name"        # binary name of the engine to use
+  protocol: "uci"            # "uci" or "xboard"
+  polyglot:
+    enabled: false           # activate polyglot book
+    book: "engines/book.bin" # book file path
+    max_depth: 8             # half move max depth
+    min_weight: 1            # selects move with highest weight but not below this value
+    random: true             # selects move randomly; otherwise select the best but not below the min_weight
+  uci_options:               # arbitrary UCI options passed to the engine
+    Move Overhead: 100       # increase if your bot flags games too often
+    Threads: 2               # max CPU threads the engine can use
+    Hash: 256                # max memory (in megabytes) the engine can allocate
+#   go_commands:             # additional options to pass to the UCI go command
+#     nodes: 1               # Search so many nodes only.
+#     depth: 5               # Search depth ply only.
+#     movetime: 1000         # Integer. Search exactly movetime milliseconds.
+# xboard_options:            # arbitrary xboard options passed to the engine
+#   cores: "4"
+#   memory: "4096"
+#   egtpath:                 # dir containing egtb, relative to this project
+#     gaviota: "Gaviota path"
+#     nalimov: "Nalimov Path"
+#     scorpio: "Scorpio Path"
+#     syzygy: "Syzygy Path"
+# lczero:                    # lczero specific settings
+#   weights: "engines/latest.txt" # weights file path
+#   threads: 1               # max CPU threads the engine can use
+#   gpu: 0                   # which GPU to use
+#   tempdecay: 15            # ?
+#   noise: true              # ?
+#   log: "./engines/log.txt" # save log of lczero debug output
+  silence_stderr: false      # some engines (yes you, leela) are very noisy
+
+abort_time: 20               # time to abort a game in seconds when there is no activity
+fake_think_time: false       # artificially slow down the bot to pretend like it's thinking
+
+challenge:                   # incoming challenges
+  concurrency: 1             # number of games to play simultaneously
+  sort_by: "best"            # possible values: "best", "first"
+  accept_bot: false          # accepts challenges coming from other bots
+  variants:                  # chess variants to accept (http://lichess.org/variant)
+    - standard
+#   - fromPosition
+#   - antichess
+#   - atomic
+#   - chess960
+#   - crazyhouse
+#   - horde
+#   - kingOfTheHill
+#   - racingKings
+#   - threeCheck
+  time_controls:             # time controls to accept
+#   - ultraBullet
+    - bullet
+    - blitz
+    - rapid
+#   - classical
+#   - correspondence
+  modes:                     # game modes to accept
+    - casual                 # unrated games
+    - rated                  # rated games - must comment if the engine doesn't try to win
+"""
