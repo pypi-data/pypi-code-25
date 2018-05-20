@@ -1,0 +1,5 @@
+"""Constants for speciify db type"""
+AWS_DYNAMO = "dynamo"
+GCP_DATASTORE = "datastore"
+REDIS = "redis"
+MONGO = "mongo"
