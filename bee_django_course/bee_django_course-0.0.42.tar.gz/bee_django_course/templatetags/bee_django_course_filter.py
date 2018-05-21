@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+__author__ = 'zhangyue'
+
+from django import template
+from django.conf import settings
+
+from bee_django_course.exports import filter_local_datetime
+
+register = template.Library()
+
+
+# 本地化时间
+@register.filter
+def local_datetime(_datetime):
+    return filter_local_datetime(_datetime)
+
+
+# 求两个值的差的绝对值
+@register.filter
+def get_difference_abs(a, b):
+    return abs(a - b)
+
+
+# 获取视频供应商的名字
+@register.filter
+def get_video_provider_name():
+    return settings.COURSE_VIDEO_PROVIDER_NAME
+
+
+# 点播视频播放地址
+@register.filter
+def get_video_src(video_id):
+    vid = video_id.__str__()
+    return "https://p.bokecc.com/playhtml.bo?vid=" + vid + "&siteid=" + settings.COURSE_CC_USERID + "&autoStart=false&playerid=" + settings.COURSE_CC_PLAYERID + "&playertype=1"
+
+
+# 用户是否学了此课程
+@register.simple_tag
+def has_course(user, course):
+    return course.is_my_course(user)
+
+
+# 课程显示状态
+@register.simple_tag
+def course_status(status):
+    if status == 0:
+        return '显示'
+    else:
+        return '不显示'
