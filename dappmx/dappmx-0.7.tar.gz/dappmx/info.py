@@ -1,0 +1,2 @@
+API_VERSION = '1.0'
+LIB_VERSION = '0.7'
