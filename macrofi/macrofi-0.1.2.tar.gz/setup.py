@@ -1,0 +1,21 @@
+from setuptools import setup, find_packages
+
+setup(name='macrofi',
+      version='0.1.2',
+      description='PyMacroFI Platform',
+      url='http://wangluzhou.com',
+      author='wangluzhou',
+      author_email='wangluzhou@aliyun.com',
+      license='MIT',
+      packages=find_packages(),
+      include_package_data=True,
+      install_requires=['numpy>=1.11',
+                        'pandas>=0.19',
+                        'pyyaml',
+                        'cached_property',
+                        'pandas_datareader',
+                        'windhelper>=0.1',
+                        'pyfi>=0.1',
+                        'pyecharts',
+                        'sqlalchemy'],
+      zip_safe=False)
